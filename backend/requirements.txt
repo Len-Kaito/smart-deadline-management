@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+icalendar
+recurring-ical-events
+pytz
+python-multipart
+google-genai
+python-dotenv

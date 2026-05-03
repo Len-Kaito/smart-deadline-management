@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Deadline - Trợ lý Sinh viên</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'SF Pro Text', 'Inter', 'Helvetica Neue', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            green: '#00E87A',
+                            blue: '#4DA6FF',
+                            pink: '#FF4D6D',
+                            orange: '#FFB830',
+                            dark: '#050508', /* Match the App background exactly */
+                            card: 'rgba(255, 255, 255, 0.03)'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        body {
+            background-color: #050508;
+            color: #ffffff;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        /* Glassmorphism utility to match the App */
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        /* App-like wave glow effects */
+        .calm-wave {
+            position: absolute;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(circle at 50% 0%, rgba(77,166,255,0.08) 0%, transparent 60%),
+                        radial-gradient(circle at 100% 50%, rgba(0,232,122,0.05) 0%, transparent 50%),
+                        radial-gradient(circle at 0% 100%, rgba(255,165,0,0.05) 0%, transparent 50%);
+            z-index: -1;
+            pointer-events: none;
+            opacity: 0.8;
+            animation: breathe 8s ease-in-out infinite alternate;
+        }
+
+        @keyframes breathe {
+            0% { opacity: 0.6; transform: scale(1); }
+            100% { opacity: 0.9; transform: scale(1.02); }
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #00E87A, #4DA6FF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Image Mockup Styling */
+        .mockup-container {
+            border-radius: 24px;
+            padding: 8px;
+            background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.02));
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.1);
+            transform: perspective(1200px) rotateX(2deg) rotateY(-4deg);
+            transition: all 0.5s ease;
+        }
+        .mockup-container:hover {
+            transform: perspective(1200px) rotateX(0deg) rotateY(0deg) scale(1.02);
+            border-color: rgba(0,232,122,0.3);
+            box-shadow: 0 30px 60px rgba(0,232,122,0.15), inset 0 1px 1px rgba(255,255,255,0.2);
+        }
+        .mockup-screen {
+            border-radius: 16px;
+            overflow: hidden;
+            background: #000;
+            border: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+        .mockup-screen img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        .mockup-phone {
+            /* No forced aspect-ratio: scales naturally with the image */
+        }
+
+        .placeholder-text {
+            color: rgba(255,255,255,0.3);
+            text-align: center;
+            padding: 40px 20px;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+            width: 100%;
+        }
+
+        .badge {
+            font-size: 10px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+        .badge-1 { background: rgba(0,232,122,0.12); color: #00E87A; }
+        .badge-2 { background: rgba(77,166,255,0.12); color: #4DA6FF; }
+        .badge-3 { background: rgba(255,165,0,0.12); color: #FFB830; }
+        .badge-4 { background: rgba(255,77,109,0.12); color: #FF4D6D; }
+    </style>
+</head>
+<body class="relative min-h-screen flex flex-col selection:bg-brand-green/30 selection:text-white">
+
+    <div class="calm-wave"></div>
+
+    <!-- Header -->
+    <header class="glass sticky top-0 z-50 border-b border-white/5">
+        <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-4">
+            <!-- Logo & Name -->
+            <div class="flex items-center gap-3 shrink-0">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-blue to-brand-green flex items-center justify-center shadow-[0_0_15px_rgba(0,232,122,0.3)]">
+                    <i class="ph-fill ph-brain text-white text-base"></i>
+                </div>
+                <span class="font-semibold text-[14px] tracking-wide leading-tight">Smart Deadline<br><span class="text-[10px] text-white/40 font-normal tracking-widest">MANAGEMENT</span></span>
+            </div>
+            <!-- Nav links -->
+            <nav class="hidden lg:flex gap-5 text-[18px] font-medium text-white/60">
+                <a href="#hero" class="hover:text-white transition-colors">Tổng Quan</a>
+                <a href="#energy" class="hover:text-white transition-colors">Bảng Điều Phối</a>
+                <a href="#frog" class="hover:text-white transition-colors">Chọn Task Khó</a>
+                <a href="#matrix" class="hover:text-white transition-colors">Neural Matrix</a>
+                <a href="#flow" class="hover:text-white transition-colors">Flow State</a>
+                <a href="#stats" class="hover:text-white transition-colors">Thống Kê</a>
+            </nav>
+            <!-- Source code CTA -->
+            <a href="https://github.com" target="_blank" class="shrink-0 flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[16px] font-medium transition-all text-white/80">
+                <i class="ph-fill ph-github-logo text-[16px]"></i>
+                Xem mã nguồn
+            </a>
+        </div>
+    </header>
+
+    <main class="flex-grow">
+        
+        <!-- Hero Section -->
+        <section id="hero" class="max-w-6xl mx-auto px-6 pt-28 pb-20 flex flex-col lg:flex-row items-center gap-16">
+            <div class="flex-1 space-y-6 text-center lg:text-left z-10">
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-brand-green/10 border border-brand-green/20">
+                    <div class="w-1.5 h-1.5 rounded-full bg-brand-green animate-pulse"></div>
+                    <span class="text-[10px] font-bold text-brand-green tracking-[2px] uppercase">Hệ Thống Quản Lý Deadline Thế Hệ Mới</span>
+                </div>
+                <h1 class="text-4xl lg:text-[56px] font-bold leading-[1.15] tracking-tight">
+                    Sinh viên làm việc <br>
+                    bằng <span class="gradient-text">năng lượng</span>,<br>
+                    không phải <span class="text-white/40">bằng may rủi.</span>
+                </h1>
+                <p class="text-[15px] text-white/50 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+                    Phần lớn ứng dụng To-Do List chỉ đếm số lượng task. <b class="text-white/70">Smart Deadline Management</b> đi sâu hơn: đo Nợ ngủ, phân tích khung giờ đỉnh tập trung, và dùng AI để đảm bảo bạn luôn giải quyết đúng việc, đúng lúc, đúng sức.
+                </p>
+                <div class="pt-4">
+                    <a href="#matrix" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-gradient-to-r from-brand-green to-[#00b45c] text-[#050508] font-semibold text-[14px] hover:scale-105 transition-transform shadow-[0_0_20px_rgba(0,232,122,0.3)]">
+                        Khám phá Tính năng <i class="ph-bold ph-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="flex-1 w-full max-w-[320px] lg:max-w-[340px] relative z-10">
+                <div class="absolute -inset-10 bg-brand-green opacity-10 blur-3xl rounded-[3rem]"></div>
+                <div class="mockup-container">
+                    <div class="mockup-screen mockup-phone">
+                        <img src="images/home_full.png" alt="Home Dashboard Mockup" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="placeholder-text hidden">
+                            <i class="ph ph-image text-4xl mb-2 text-white/20"></i><br>
+                            Chụp TOÀN BỘ màn hình <b>Home</b><br>Lưu thành images/home_full.png
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent my-8"></div>
+
+        <!-- Section 1: Dashboard Năng lượng -->
+        <section id="energy" class="max-w-6xl mx-auto px-6 py-20 flex flex-col-reverse lg:flex-row items-center gap-16">
+            <div class="flex-1 w-full relative">
+                <div class="absolute -inset-10 bg-brand-orange opacity-10 blur-3xl rounded-[3rem]"></div>
+                <div class="mockup-container">
+                    <div class="mockup-screen">
+                        <img src="images/overview_widget.png" alt="Overview Dashboard Mockup" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="placeholder-text hidden">
+                            <i class="ph ph-image text-4xl mb-2 text-white/20"></i><br>
+                            Chụp phần <b>Tổng Quan Hôm Nay</b><br>Lưu thành images/overview_widget.png
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex-1 space-y-6">
+                <div class="w-10 h-10 rounded-xl bg-brand-orange/10 border border-brand-orange/20 flex items-center justify-center mb-4">
+                    <i class="ph-fill ph-lightning text-xl text-brand-orange"></i>
+                </div>
+                <h2 class="text-3xl lg:text-4xl font-bold tracking-tight">Bảng <span class="text-brand-orange">Tổng Quan AI</span></h2>
+                <p class="text-white/50 text-[15px] leading-relaxed">
+                    Hệ thống tổng hợp toàn bộ bức tranh năng suất của bạn trong ngày: Tổng số task, Task khẩn cấp, Mức độ Năng lượng, và Gợi ý giờ ngủ bù. Đặc biệt, UI của ứng dụng thay đổi trực tiếp dựa trên Nợ ngủ (Sleep Debt) và Thời điểm sinh học.
+                </p>
+                <div class="space-y-3 mt-6">
+                    <!-- Tổng số task -->
+                    <div class="glass p-4 rounded-xl flex items-center justify-between border-l-2 border-brand-blue">
+                        <span class="text-brand-blue text-[13px] font-bold tracking-wide">TỔNG SỐ TASK</span>
+                        <span class="text-white/40 text-[12px]">Khối lượng công việc trong ngày</span>
+                    </div>
+                    <!-- Task khẩn cấp -->
+                    <div class="glass p-4 rounded-xl flex items-center justify-between border-l-2 border-brand-pink">
+                        <span class="text-brand-pink text-[13px] font-bold tracking-wide">TASK KHẨN CẤP</span>
+                        <span class="text-white/40 text-[12px]">Báo động các deadline sắp đến</span>
+                    </div>
+                    <!-- Năng lượng & Nợ ngủ -->
+                    <div class="glass p-4 rounded-xl flex items-center justify-between border-l-2 border-brand-orange">
+                        <span class="text-brand-orange text-[13px] font-bold tracking-wide">MỨC NĂNG LƯỢNG</span>
+                        <span class="text-white/40 text-[12px]">Cao / Trung Bình / Cạn Kiệt (từ Nợ Ngủ)</span>
+                    </div>
+                    <!-- Gợi ý ngủ bù -->
+                    <div class="glass p-4 rounded-xl flex items-center justify-between border-l-2 border-brand-green">
+                        <span class="text-brand-green text-[13px] font-bold tracking-wide">GỢI Ý NGỦ BÙ</span>
+                        <span class="text-white/40 text-[12px]">Đồng bộ lịch học để tìm giờ nghỉ</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 1.5: Chọn Task Khó Nhất -->
+        <section id="frog" class="max-w-6xl mx-auto px-6 py-20 flex flex-col lg:flex-row items-center gap-16">
+            <div class="flex-1 space-y-6">
+                <div class="w-10 h-10 rounded-xl bg-brand-green/10 border border-brand-green/20 flex items-center justify-center mb-4">
+                    <i class="ph-fill ph-target text-xl text-brand-green"></i>
+                </div>
+                <h2 class="text-3xl lg:text-4xl font-bold tracking-tight">Chọn Task <span class="text-brand-green">Khó Nhất</span> Trước Tiên</h2>
+                <p class="text-white/50 text-[15px] leading-relaxed">
+                    Ngay trên màn hình chủ, AI sẽ tự động phân tích độ khó (Trọng số) của từng task và ép bạn phải giải quyết những công việc khó nhất vào đầu ngày, khi năng lượng còn dồi dào.
+                </p>
+                <div class="mt-4 p-4 rounded-xl bg-white/5 border border-white/10 text-[13px] text-white/60 leading-relaxed">
+                    Hệ thống sẽ gợi ý danh sách ưu tiên dựa trên tổ hợp: <b>Độ khó task + Deadline</b>. Bạn không thể trốn tránh các Đồ án hay Bài tập lớn bằng cách làm hàng chục task nhỏ lẻ.
+                </div>
+            </div>
+            <div class="flex-1 w-full relative">
+                <div class="absolute -inset-10 bg-brand-green opacity-10 blur-3xl rounded-[3rem]"></div>
+                <div class="mockup-container">
+                    <div class="mockup-screen">
+                        <img src="images/frog_tasks.png" alt="Hardest Tasks Mockup" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="placeholder-text hidden">
+                            <i class="ph ph-image text-4xl mb-2 text-white/20"></i><br>
+                            Chụp <b>NỬA màn hình dưới</b> (Danh sách Task)<br>Lưu thành images/frog_tasks.png
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Trung Tâm Điều Phối -->
+        <section id="matrix" class="max-w-6xl mx-auto px-6 py-20 flex flex-col lg:flex-row items-center gap-16">
+            <div class="flex-1 space-y-6">
+                <div class="w-10 h-10 rounded-xl bg-brand-blue/10 border border-brand-blue/20 flex items-center justify-center mb-4">
+                    <i class="ph-fill ph-intersect text-xl text-brand-blue"></i>
+                </div>
+                <h2 class="text-3xl lg:text-4xl font-bold tracking-tight">Trung Tâm Điều Phối <br><span class="text-brand-blue">(Neural Matrix)</span></h2>
+                <p class="text-white/50 text-[15px] leading-relaxed">
+                    Trang trung tâm nơi mọi tính toán AI hội tụ. Giao diện hiển thị liền mạch từ "Nhiệm vụ tiếp theo" cho đến Ma trận Eisenhower 4 ô và các chỉ số đo lường hiệu suất ở cuối trang.
+                </p>
+                <ul class="space-y-4 mt-6">
+                    <li class="flex gap-3 bg-brand-blue/5 p-4 rounded-xl border border-brand-blue/10">
+                        <i class="ph-fill ph-intersect text-brand-blue text-lg mt-0.5"></i>
+                        <div>
+                            <strong class="block text-[14px] text-brand-blue mb-1">Ma trận 4 Ô (Khẩn cấp Tương đối)</strong>
+                            <p class="text-white/50 text-[13px] leading-relaxed">Chia task thành Ưu tiên 1-4. Sử dụng Hàm phạt điểm số mũ <code>math.pow(2, threshold - time_left)</code> để đẩy điểm ưu tiên lên cực hạn cho task sắp đến hạn.</p>
+                        </div>
+                    </li>
+                    <li class="flex gap-3 glass p-4 rounded-xl">
+                        <i class="ph-fill ph-play text-brand-blue text-lg mt-0.5"></i>
+                        <div>
+                            <strong class="block text-[14px] text-white mb-1">Nhiệm vụ tiếp theo & Flow</strong>
+                            <p class="text-white/50 text-[13px] leading-relaxed">Luôn chốt hạ 1 công việc quan trọng nhất trên cùng màn hình. Một nút bấm đưa bạn ngay vào trạng thái Flow State.</p>
+                        </div>
+                    </li>
+                    <li class="flex gap-3 glass p-4 rounded-xl border-l-2 border-brand-green">
+                        <i class="ph-fill ph-target text-brand-green text-lg mt-0.5"></i>
+                        <div>
+                            <strong class="block text-[14px] text-white mb-1">Điểm Tập Trung (%) Động</strong>
+                            <p class="text-white/50 text-[13px] leading-relaxed">Không phải số ảo. Điểm tập trung hiển thị trên ma trận = <code>100 - (Nợ ngủ * 5)</code>.</p>
+                        </div>
+                    </li>
+                    <li class="flex gap-3 glass p-4 rounded-xl border-l-2 border-brand-orange">
+                        <i class="ph-fill ph-trend-up text-brand-orange text-lg mt-0.5"></i>
+                        <div>
+                            <strong class="block text-[14px] text-brand-orange mb-1">Dự báo Đỉnh Tập Trung</strong>
+                            <p class="text-white/50 text-[13px] leading-relaxed">Hệ thống AI phân tích các lịch sử khung thời gian làm việc của bạn để tìm ra giờ "Đỉnh tập trung" (Peak Focus), giúp bạn phân bổ task phức tạp nhất vào đúng thời điểm đó.</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="flex-1 w-full max-w-[320px] lg:max-w-[340px] relative">
+                <div class="absolute -inset-10 bg-brand-blue opacity-10 blur-3xl rounded-[3rem]"></div>
+                <!-- YÊU CẦU: Lưu ảnh 'matrix.png' -->
+                <div class="mockup-container">
+                    <div class="mockup-screen mockup-phone">
+                        <img src="images/matrix.png" alt="Matrix Mockup" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="placeholder-text hidden">
+                            <i class="ph ph-image text-4xl mb-2 text-white/20"></i><br>
+                            Chụp <b>TOÀN BỘ màn hình</b> Neural Matrix<br>Lưu thành images/matrix.png
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2.5: Flow State -->
+        <section id="flow" class="max-w-6xl mx-auto px-6 py-20 flex flex-col-reverse lg:flex-row items-center gap-16">
+            <div class="flex-1 w-full max-w-[320px] lg:max-w-[340px] relative">
+                <div class="absolute -inset-10 bg-brand-green opacity-10 blur-3xl rounded-[3rem]"></div>
+                <!-- YÊU CẦU: Lưu ảnh 'flow.png' -->
+                <div class="mockup-container">
+                    <div class="mockup-screen mockup-phone">
+                        <img src="images/flow.png" alt="Flow State Mockup" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="placeholder-text hidden">
+                            <i class="ph ph-image text-4xl mb-2 text-white/20"></i><br>
+                            Chụp <b>TOÀN BỘ màn hình</b> Flow State<br>Lưu thành images/flow.png
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex-1 space-y-6">
+                <div class="w-10 h-10 rounded-xl bg-brand-green/10 border border-brand-green/20 flex items-center justify-center mb-4">
+                    <i class="ph-fill ph-timer text-xl text-brand-green"></i>
+                </div>
+                <h2 class="text-3xl lg:text-4xl font-bold tracking-tight">Kích Hoạt Tập Trung <br><span class="text-brand-green">(Flow State)</span></h2>
+                <p class="text-white/50 text-[15px] leading-relaxed">
+                    Đã đến lúc giải quyết nhiệm vụ. Màn hình Flow State đưa bạn vào môi trường cách ly hoàn toàn với xao nhãng, ép bạn phải hoàn thành xong công việc trước khi chuyển sang việc khác.
+                </p>
+                <ul class="space-y-4 mt-6">
+                    <li class="flex gap-3 bg-brand-green/5 p-4 rounded-xl border border-brand-green/10">
+                        <i class="ph-fill ph-clock-countdown text-brand-green text-lg mt-0.5"></i>
+                        <div>
+                            <strong class="block text-[14px] text-brand-green mb-1">Chế Độ Kép (Dual Mode)</strong>
+                            <p class="text-white/50 text-[13px] leading-relaxed">Chuyển đổi linh hoạt giữa Flowtime (Tập trung không giới hạn) và Pomodoro (25/5 phút) tùy thuộc vào tính chất công việc hiện tại.</p>
+                        </div>
+                    </li>
+                    <li class="flex gap-3 glass p-4 rounded-xl border-l-2 border-brand-green">
+                        <i class="ph-fill ph-check-circle text-brand-green text-lg mt-0.5"></i>
+                        <div>
+                            <strong class="block text-[14px] text-white mb-1">Ghi Nhận & Tính Hiệu Suất Tức Thì</strong>
+                            <p class="text-white/50 text-[13px] leading-relaxed">Khi ấn nút Hoàn thành, điểm hiệu suất sẽ lập tức được cộng vào hồ sơ dựa trên trọng số độ khó của task.</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Section 3: Thống Kê Kết Phiên -->
+        <section id="stats" class="max-w-6xl mx-auto px-6 py-20 flex flex-col-reverse lg:flex-row items-center gap-16">
+            <div class="flex-1 w-full max-w-[320px] lg:max-w-[340px] relative">
+                <div class="absolute -inset-10 bg-brand-orange opacity-10 blur-3xl rounded-[3rem]"></div>
+                <!-- YÊU CẦU: Lưu ảnh 'stats.png' -->
+                <div class="mockup-container">
+                    <div class="mockup-screen mockup-phone">
+                        <img src="images/stats.png" alt="Stats Mockup" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="placeholder-text hidden">
+                            <i class="ph ph-image text-4xl mb-2 text-white/20"></i><br>
+                            Chụp <b>TOÀN BỘ màn hình</b> Thống Kê (All Done)<br>Lưu thành images/stats.png
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex-1 space-y-6">
+                <div class="w-10 h-10 rounded-xl bg-brand-orange/10 border border-brand-orange/20 flex items-center justify-center mb-4">
+                    <i class="ph-fill ph-trophy text-xl text-brand-orange"></i>
+                </div>
+                <h2 class="text-3xl lg:text-4xl font-bold tracking-tight">Tổng Kết Phiên Làm Việc<br><span class="text-brand-orange">(All Done)</span></h2>
+                <p class="text-white/50 text-[15px] leading-relaxed">
+                    Khi bạn hoàn thành toàn bộ task trong ngày, hệ thống tự động tổng hợp kết quả và đánh giá hiệu suất thực sự — không phải chỉ đếm số lượng công việc.
+                </p>
+                <ul class="space-y-4 mt-6">
+                    <li class="flex gap-3 bg-brand-orange/5 p-4 rounded-xl border border-brand-orange/10">
+                        <i class="ph-fill ph-chart-pie text-brand-orange text-lg mt-0.5"></i>
+                        <div>
+                            <strong class="block text-[14px] text-brand-orange mb-1">Hiệu Suất Trọng Số (Weighted Efficiency)</strong>
+                            <p class="text-white/50 text-[13px] leading-relaxed">Hoàn thành 1 đồ án phức tạp (trọng số = 3 điểm) đóng góp tương đương 3 task đơn giản. Hệ thống không để bạn tự đánh lừa bản thân bằng cách làm nhiều việc không quan trọng.</p>
+                        </div>
+                    </li>
+                    <li class="flex gap-3 glass p-4 rounded-xl">
+                        <i class="ph-fill ph-clock text-brand-orange text-lg mt-0.5"></i>
+                        <div>
+                            <strong class="block text-[14px] text-white mb-1">Thời Gian Phiên Làm Việc</strong>
+                            <p class="text-white/50 text-[13px] leading-relaxed">Thống kê tổng thời gian tập trung thực tế (Flow Time) và số task đã xử lý xong trong phiên để so sánh với các ngày trước.</p>
+                        </div>
+                    </li>
+                    <li class="flex gap-3 glass p-4 rounded-xl border-l-2 border-brand-blue">
+                        <i class="ph-fill ph-sparkle text-brand-blue text-lg mt-0.5"></i>
+                        <div>
+                            <strong class="block text-[14px] text-brand-blue mb-1">Bổ Sung Task Ngày Mai (Task Injection)</strong>
+                            <p class="text-white/50 text-[13px] leading-relaxed">Hệ thống tự động đề xuất 3 task học tập ưu tiên cao cho ngày hôm sau để duy trì đà làm việc liên tục và không để năng lượng bị lãng phí.</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/5 bg-[#030305] py-12 mt-10">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="flex flex-col md:flex-row items-center md:items-start justify-between gap-8">
+                <!-- Logo + Name -->
+                <div class="flex flex-col items-center md:items-start gap-3">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-blue to-brand-green flex items-center justify-center shadow-[0_0_20px_rgba(0,232,122,0.2)]">
+                            <i class="ph-fill ph-brain text-[#050508] text-base"></i>
+                        </div>
+                        <div>
+                            <p class="font-bold text-white text-[15px] tracking-wide">Smart Deadline Management</p>
+                        </div>
+                    </div>
+                    <p class="text-white/30 text-[12px] max-w-[260px] text-center md:text-left leading-relaxed">
+                        Ứng dụng quản lý deadline thông minh dành cho sinh viên, tích hợp AI phân tích độ khó và năng lượng.
+                    </p>
+                </div>
+
+                <!-- Academic Info -->
+                <div class="text-center md:text-right text-[12px] text-white/40 space-y-1.5">
+                    <p class="text-white/60 font-semibold text-[13px] mb-2">Thông tin Đồ án</p>
+                    <p>Trường Đại học Công nghệ Thông tin-ĐHQG.HCM</p>
+                    <p class="mt-1">Lớp: <span class="text-white/60">SS004.Q24</span></p>
+                    <p>Nhóm: <span class="text-white/60">Nhóm 11</span></p>
+                </div>
+            </div>
+
+        </div>
+    </footer>
+
+</body>
+</html>
