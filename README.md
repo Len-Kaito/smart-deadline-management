@@ -140,18 +140,6 @@ smart-deadline-management/
 └── README.md
 ```
 
----
-
-## 🌐 Landing Page
-
-Trang giới thiệu tĩnh nằm tại thư mục `LandingPage/`. Để deploy:
-
-1. Truy cập [Netlify Drop](https://app.netlify.com/drop)
-2. Kéo thả toàn bộ thư mục `LandingPage/` vào trang
-3. Lấy link để đính kèm vào báo cáo
-
----
-
 ## 📐 Thuật toán cốt lõi
 
 ### Dynamic Panic Threshold (Relative Urgency)
